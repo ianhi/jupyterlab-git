@@ -730,6 +730,15 @@ class Git:
             return {"code": code, "command": " ".join(cmd), "message": error}
         return {"code": code}
 
+    async def merge(self, merge_from, merge_into):
+        """
+        Execute git merge command & return the result.
+        """
+        cmd = ["git", "merge", merge_from, merge_into]
+        print(cmd)
+        return {"code": 0}
+
+
     async def commit(self, commit_msg, top_repo_path):
         """
         Execute git commit <filename> command & return the result.
