@@ -2,6 +2,7 @@ import { IChangedArgs } from '@jupyterlab/coreutils';
 import { Token, JSONObject } from '@phosphor/coreutils';
 import { IDisposable } from '@phosphor/disposable';
 import { ISignal } from '@phosphor/signaling';
+import { CommandRegistry } from '@phosphor/commands';
 
 export const EXTENSION_ID = 'jupyter.extensions.git_plugin';
 
@@ -35,6 +36,10 @@ export interface IGitExtension extends IDisposable {
    */
   readonly repositoryChanged: ISignal<IGitExtension, IChangedArgs<string>>;
 
+  /**
+   * get command registry
+   */
+  commands: CommandRegistry;
   /**
    * Test whether the model is ready;
    * i.e. if the top folder repository has been found.
