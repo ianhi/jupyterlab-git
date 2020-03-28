@@ -18,6 +18,7 @@ import {
   wrapperClass
 } from '../style/BranchMenu';
 import { NewBranchDialog } from './NewBranchDialog';
+import { Menu } from '@phosphor/widgets';
 
 const CHANGES_ERR_MSG =
   'The current branch contains files with uncommitted changes. Please commit or discard these changes before switching to or creating another branch.';
@@ -75,10 +76,31 @@ export class BranchMenu extends React.Component<
    * @param props - component properties
    * @returns React component
    */
+  private rightClicked?: string; // not a part of state to prevent rerendering
   constructor(props: IBranchMenuProps) {
     super(props);
 
     const repo = this.props.model.pathRepository;
+    const commands = this.props.model.commands;
+    this._contextMenuOtherBranch = new Menu({ commands });
+
+    if (!commands.hasCommand('git:merge')) {
+      commands.addCommand('git:merge', {
+        label: 'Merge into current branch',
+        caption: 'Merge selected branch into current branch',
+        execute: async() => {
+          if(this.rightClicked){
+            this.props.model.merge(this.rightClicked)
+          }
+        }
+      });
+    }
+
+    [
+      'git:merge'
+    ].forEach(command => {
+      this._contextMenuOtherBranch.addItem({ command });
+    });
 
     this.state = {
       filter: '',
@@ -138,7 +160,9 @@ export class BranchMenu extends React.Component<
             onClick={this._onNewBranchClick}
           />
         </div>
-        <div className={listWrapperClass}>
+        <div className={listWrapperClass}
+          onContextMenu={event => event.preventDefault()}
+        >
           <List disablePadding>{this._renderItems()}</List>
         </div>
         <NewBranchDialog
@@ -183,7 +207,8 @@ export class BranchMenu extends React.Component<
           branch.name === this.state.current ? activeListItemClass : null
         )}
         key={branch.name}
-        onClick={this._onBranchClickFactory(branch.name)}
+        onClick={this._onBranchClickFactory(branch.name, true)}
+        onContextMenu={this._onBranchClickFactory(branch.name, false)}
       >
         <span className={listItemIconClass} />
         {branch.name}
@@ -271,9 +296,9 @@ export class BranchMenu extends React.Component<
    * @param branch - branch name
    * @returns callback
    */
-  private _onBranchClickFactory(branch: string) {
+  private _onBranchClickFactory(branch: string, left: boolean) {
     const self = this;
-    return onClick;
+    return left ? onClick : onContextMenu;
 
     /**
      * Callback invoked upon clicking a branch name.
@@ -293,6 +318,12 @@ export class BranchMenu extends React.Component<
         .checkout(opts)
         .then(onResolve)
         .catch(onError);
+    }
+
+    function onContextMenu(event: React.MouseEvent): void{
+      event.preventDefault();
+      self.rightClicked = branch;
+      self._contextMenuOtherBranch.open(event.clientX, event.clientY);
     }
 
     /**
@@ -317,4 +348,5 @@ export class BranchMenu extends React.Component<
       showErrorMessage('Error switching branch', err.message);
     }
   }
+  private _contextMenuOtherBranch: Menu;
 }
