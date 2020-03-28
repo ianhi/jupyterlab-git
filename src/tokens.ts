@@ -2,6 +2,7 @@ import { IChangedArgs } from '@jupyterlab/coreutils';
 import { Token, JSONObject } from '@phosphor/coreutils';
 import { IDisposable } from '@phosphor/disposable';
 import { ISignal } from '@phosphor/signaling';
+import { CommandRegistry } from '@phosphor/commands';
 
 export const EXTENSION_ID = 'jupyter.extensions.git_plugin';
 
@@ -40,6 +41,11 @@ export interface IGitExtension extends IDisposable {
    * i.e. if the top folder repository has been found.
    */
   isReady: boolean;
+
+  /**
+   * The CommandRegistry
+   */
+  commands: CommandRegistry;
 
   /**
    * A promise that fulfills when the model is ready;
