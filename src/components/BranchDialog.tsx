@@ -28,9 +28,10 @@ import {
   listItemTitleClass,
   listWrapperClass,
   nameInputClass,
+  performMergeClass,
   titleClass,
   titleWrapperClass
-} from '../style/NewBranchDialog';
+} from '../style/BranchDialog';
 
 const BRANCH_DESC = {
   current:
@@ -42,7 +43,7 @@ const BRANCH_DESC = {
 /**
  * Interface describing component properties.
  */
-export interface INewBranchDialogProps {
+export interface IBranchDialogProps {
   /**
    * Git extension data model.
    */
@@ -57,12 +58,17 @@ export interface INewBranchDialogProps {
    * Callback to invoke upon closing the dialog.
    */
   onClose: () => void;
+
+  /**
+   * Boolean indicating if we are merging or creating a new branch
+   */
+  mergeDialog: boolean;
 }
 
 /**
  * Interface describing component state.
  */
-export interface INewBranchDialogState {
+export interface IBranchDialogState {
   /**
    * Branch name.
    */
@@ -92,9 +98,9 @@ export interface INewBranchDialogState {
 /**
  * React component for rendering a dialog to create a new branch.
  */
-export class NewBranchDialog extends React.Component<
-  INewBranchDialogProps,
-  INewBranchDialogState
+export class BranchDialog extends React.Component<
+  IBranchDialogProps,
+  IBranchDialogState
 > {
   /**
    * Returns a React component for rendering a branch menu.
@@ -102,7 +108,7 @@ export class NewBranchDialog extends React.Component<
    * @param props - component properties
    * @returns React component
    */
-  constructor(props: INewBranchDialogProps) {
+  constructor(props: IBranchDialogProps) {
     super(props);
 
     const repo = this.props.model.pathRepository;
@@ -145,7 +151,11 @@ export class NewBranchDialog extends React.Component<
         onClose={this._onClose}
       >
         <div className={titleWrapperClass}>
-          <p className={titleClass}>Create a Branch</p>
+          <p className={titleClass}>
+            {this.props.mergeDialog
+              ? `Merge into ${this.props.model.currentBranch.name}`
+              : ' Create a Branch'}
+          </p>
           <button className={closeButtonClass}>
             <ClearIcon
               titleAccess="Close this dialog"
@@ -155,16 +165,12 @@ export class NewBranchDialog extends React.Component<
           </button>
         </div>
         <div className={contentWrapperClass}>
-          <p>Name</p>
-          <input
-            className={nameInputClass}
-            type="text"
-            onChange={this._onNameChange}
-            value={this.state.name}
-            placeholder=""
-            title="Enter a branch name"
-          />
-          <p>Create branch based on...</p>
+          {this.props.mergeDialog ? null : this._renderNameInput()}
+          <p>
+            {this.props.mergeDialog
+              ? 'Choose a branch to merge'
+              : 'Create branch based on...'}
+          </p>
           <div className={filterWrapperClass}>
             <div className={filterClass}>
               <input
@@ -198,18 +204,51 @@ export class NewBranchDialog extends React.Component<
             value="Cancel"
             onClick={this._onClose}
           />
-          <input
-            className={classes(buttonClass, createButtonClass)}
-            type="button"
-            title="Create a new branch"
-            value="Create Branch"
-            onClick={this._onCreate}
-          />
+          {this.props.mergeDialog ? (
+            this._renderMergeButton()
+          ) : (
+            <input
+              className={classes(buttonClass, createButtonClass)}
+              type="button"
+              title="Create a new branch"
+              value="Create Branch"
+              onClick={this._onCreate}
+            />
+          )}
         </DialogActions>
       </Dialog>
     );
   }
 
+  private _renderNameInput() {
+    return (
+      <div>
+        {' '}
+        <p>Name</p>
+        <input
+          className={nameInputClass}
+          type="text"
+          onChange={this._onNameChange}
+          value={this.state.name}
+          placeholder=""
+          title="Enter a branch name"
+        />
+      </div>
+    );
+  }
+  private _renderMergeButton() {
+    return (
+      <button
+        className={classes(buttonClass, performMergeClass)}
+        type="button"
+        title="Merge into current branch."
+        disabled={this.state.base === this.state.current}
+        onClick={this._onMerge}
+      >
+        merge <b>{this.state.base}</b> into <b>{this.state.current}</b>
+      </button>
+    );
+  }
   /**
    * Renders branch menu items.
    *
@@ -252,7 +291,11 @@ export class NewBranchDialog extends React.Component<
     idx: number
   ): React.ReactElement | null {
     // Perform a "simple" filter... (TODO: consider implementing fuzzy filtering)
-    if (this.state.filter && !branch.name.includes(this.state.filter)) {
+    if (
+      (this.state.filter && !branch.name.includes(this.state.filter)) ||
+      (this.props.mergeDialog &&
+        branch.name === this.props.model.currentBranch.name)
+    ) {
       return null;
     }
     const isBase = branch.name === this.state.base;
@@ -387,6 +430,27 @@ export class NewBranchDialog extends React.Component<
   };
 
   /**
+   * Callback invoked upon clicking a button to merge.
+   *
+   * @param event - event object
+   */
+  private _onMerge = (): void => {
+    const branch = this.state.name;
+
+    // Close the branch dialog:
+    this.props.onClose();
+
+    // Reset the branch name and filter:
+    this.setState({
+      name: '',
+      filter: ''
+    });
+
+    // Create the branch:
+    this._mergeBranch(branch);
+  };
+
+  /**
    * Callback invoked upon clicking a button to create a new branch.
    *
    * @param event - event object
@@ -413,6 +477,9 @@ export class NewBranchDialog extends React.Component<
    * @param branch - branch name
    */
   private _createBranch(branch: string): void {
+    if (branch === ''){
+      showErrorMessage('You need to give the branch a name','')
+    }
     const opts = {
       newBranch: true,
       branchname: branch
@@ -443,5 +510,40 @@ export class NewBranchDialog extends React.Component<
     function onError(err: any): void {
       showErrorMessage('Error creating branch', err.message);
     }
+  }
+  private _mergeBranch(branch: string): void {
+    const opts = {
+      newBranch: true,
+      branchname: branch
+    };
+    console.log(opts);
+    console.log('gotta implement git merge!');
+    //    this.props.model
+    //    .merge(opts)
+    //   .then(onResolve)
+    //  .catch(onError);
+
+    /**
+     * Callback invoked upon promise resolution.
+     *
+     * @private
+     * @param result - result
+     */
+    /*function onResolve(result: any): void {
+      if (result.code !== 0) {
+        showErrorMessage('Error creating branch', result.message);
+      }
+    }
+*/
+    /**
+     * Callback invoked upon encountering an error.
+     *
+     * @private
+     * @param err - error
+     */
+    /*  function onError(err: any): void {
+      showErrorMessage('Error creating branch', err.message);
+    }
+    */
   }
 }

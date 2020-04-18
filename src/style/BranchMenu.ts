@@ -94,6 +94,25 @@ export const newBranchButtonClass = style({
   borderRadius: '3px'
 });
 
+export const mergeBranchButtonClass = style({
+  boxSizing: 'border-box',
+
+  width: '100%',
+  height: '2em',
+
+  color: 'white',
+  fontSize: 'var(--jp-ui-font-size1)',
+
+  backgroundColor: 'var(--jp-brand-color1)',
+  border: '0',
+  borderRadius: '3px',
+
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
+  textAlign: 'center'
+});
+
 export const listWrapperClass = style({
   display: 'block',
   width: '100%',

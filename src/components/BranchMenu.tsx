@@ -15,9 +15,10 @@ import {
   listItemIconClass,
   listWrapperClass,
   newBranchButtonClass,
+  mergeBranchButtonClass,
   wrapperClass
 } from '../style/BranchMenu';
-import { NewBranchDialog } from './NewBranchDialog';
+import { BranchDialog } from './BranchDialog';
 
 const CHANGES_ERR_MSG =
   'The current branch contains files with uncommitted changes. Please commit or discard these changes before switching to or creating another branch.';
@@ -47,9 +48,14 @@ export interface IBranchMenuState {
   filter: string;
 
   /**
-   * Boolean indicating whether to show a dialog to create a new branch.
+   * Boolean indicating whether to show a dialog to create or merge branches.
    */
   branchDialog: boolean;
+
+  /**
+   * Boolean indicating whether the branch dialog should be used for merging.
+   */
+  mergeDialog: boolean;
 
   /**
    * Current branch name.
@@ -83,6 +89,7 @@ export class BranchMenu extends React.Component<
     this.state = {
       filter: '',
       branchDialog: false,
+      mergeDialog: false,
       current: repo ? this.props.model.currentBranch.name : '',
       branches: repo ? this.props.model.branches : []
     };
@@ -141,10 +148,19 @@ export class BranchMenu extends React.Component<
         <div className={listWrapperClass}>
           <List disablePadding>{this._renderItems()}</List>
         </div>
-        <NewBranchDialog
+        <button
+          className={mergeBranchButtonClass}
+          type="button"
+          title="Merge a branch into the current branch"
+          onClick={this._onMergeBranchClick}
+        >
+          Choose a branch to merge into <b>{this.state.current}</b>
+        </button>
+        <BranchDialog
           open={this.state.branchDialog}
           model={this.props.model}
           onClose={this._onNewBranchDialogClose}
+          mergeDialog={this.state.mergeDialog}
         />
       </div>
     );
@@ -252,6 +268,13 @@ export class BranchMenu extends React.Component<
       return;
     }
     this.setState({
+      mergeDialog: false,
+      branchDialog: true
+    });
+  };
+  private _onMergeBranchClick = (): void => {
+    this.setState({
+      mergeDialog: true,
       branchDialog: true
     });
   };
@@ -261,6 +284,7 @@ export class BranchMenu extends React.Component<
    */
   private _onNewBranchDialogClose = (): void => {
     this.setState({
+      mergeDialog: false,
       branchDialog: false
     });
   };

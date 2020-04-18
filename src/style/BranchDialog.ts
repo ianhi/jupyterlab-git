@@ -49,7 +49,11 @@ export const titleWrapperClass = style({
 });
 
 export const titleClass = style({
-  fontWeight: 700
+  fontWeight: 700,
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
+  width: '90%'
 });
 
 export const contentWrapperClass = style({
@@ -254,6 +258,19 @@ export const buttonClass = style({
 
 export const cancelButtonClass = style({
   backgroundColor: '#757575'
+});
+
+export const performMergeClass = style({
+  backgroundColor: 'var(--jp-brand-color1)',
+  width: '100%',
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
+  $nest: {
+    '&:disabled': {
+      backgroundColor: 'black'
+    }
+  }
 });
 
 export const createButtonClass = style({
