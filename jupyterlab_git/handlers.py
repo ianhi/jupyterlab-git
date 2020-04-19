@@ -367,6 +367,25 @@ class GitCheckoutHandler(GitHandler):
         self.finish(json.dumps(body))
 
 
+class GitMergeHandler(GitHandler):
+    """
+    Handler for git merge '<merge_from> <merge_into>'. Merges into current working branch
+    """
+    @web.authenticated
+    async def post(self):
+        """
+        POST request handler, merges branches
+        """
+        data = self.get_json_body()
+        merge_from = data["merge_from"]
+        top_repo_path = data["top_repo_path"]
+        body = await self.git.merge(merge_from, top_repo_path)
+
+        if body["code"] != 0:
+            self.set_status(500)
+        self.finish(json.dumps(body))
+
+
 class GitCommitHandler(GitHandler):
     """
     Handler for 'git commit -m <message>'. Commits files.
@@ -557,6 +576,7 @@ def setup_handlers(web_app):
         ("/git/branch", GitBranchHandler),
         ("/git/changed_files", GitChangedFilesHandler),
         ("/git/checkout", GitCheckoutHandler),
+        ("/git/merge", GitMergeHandler),
         ("/git/clone", GitCloneHandler),
         ("/git/commit", GitCommitHandler),
         ("/git/config", GitConfigHandler),

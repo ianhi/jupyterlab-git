@@ -468,6 +468,31 @@ export class GitExtension implements IGitExtension {
   }
 
   /**
+   * Merge a branch into the current branch
+   *
+   * @param branch The branch to merge into the current branch
+   */
+  async merge(branch: string): Promise<Response> {
+    try {
+      let response = await httpGitRequest('/git/merge', 'POST', {
+        merge_from: branch,
+        top_repo_path: this.pathRepository
+      });
+      if (response.status !== 200) {
+        return response.json().then((data: any) => {
+          throw new ServerConnection.ResponseError(response, data.message);
+        });
+      }
+
+      await this.refreshStatus();
+
+      return response.json();
+    } catch (err) {
+      throw new ServerConnection.NetworkError(err);
+    }
+  }
+
+  /**
    * Make request for the Git Clone API.
    *
    * @param path Local path in which the repository will be cloned

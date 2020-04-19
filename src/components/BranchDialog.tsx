@@ -435,7 +435,7 @@ export class BranchDialog extends React.Component<
    * @param event - event object
    */
   private _onMerge = (): void => {
-    const branch = this.state.name;
+    const branch = this.state.base;
 
     // Close the branch dialog:
     this.props.onClose();
@@ -477,9 +477,6 @@ export class BranchDialog extends React.Component<
    * @param branch - branch name
    */
   private _createBranch(branch: string): void {
-    if (branch === ''){
-      showErrorMessage('You need to give the branch a name','')
-    }
     const opts = {
       newBranch: true,
       branchname: branch
@@ -512,16 +509,10 @@ export class BranchDialog extends React.Component<
     }
   }
   private _mergeBranch(branch: string): void {
-    const opts = {
-      newBranch: true,
-      branchname: branch
-    };
-    console.log(opts);
-    console.log('gotta implement git merge!');
-    //    this.props.model
-    //    .merge(opts)
-    //   .then(onResolve)
-    //  .catch(onError);
+    this.props.model
+      .merge(branch)
+      .then(onResolve)
+      .catch(onError);
 
     /**
      * Callback invoked upon promise resolution.
@@ -529,21 +520,20 @@ export class BranchDialog extends React.Component<
      * @private
      * @param result - result
      */
-    /*function onResolve(result: any): void {
+    function onResolve(result: any): void {
       if (result.code !== 0) {
-        showErrorMessage('Error creating branch', result.message);
+        showErrorMessage('Error merging branch', result.message);
       }
     }
-*/
+
     /**
      * Callback invoked upon encountering an error.
      *
      * @private
      * @param err - error
      */
-    /*  function onError(err: any): void {
-      showErrorMessage('Error creating branch', err.message);
+    function onError(err: any): void {
+      showErrorMessage('Error merging branch', err.message);
     }
-    */
   }
 }

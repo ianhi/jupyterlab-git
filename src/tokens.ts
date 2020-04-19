@@ -134,6 +134,13 @@ export interface IGitExtension extends IDisposable {
   checkout(options?: Git.ICheckoutOptions): Promise<Git.ICheckoutResult>;
 
   /**
+   * Make a request to the Git Merge API.
+   *
+   * @param branch to merge into the current branch
+   */
+  merge(branch: string): Promise<Response>;
+
+  /**
    * Make request for the Git Clone API.
    *
    * @param path Local path in which the repository will be cloned

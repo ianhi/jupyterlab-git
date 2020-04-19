@@ -732,6 +732,18 @@ class Git:
             return {"code": code, "command": " ".join(cmd), "message": error}
         return {"code": code}
 
+    async def merge(self, merge_from, top_repo_path):
+        """
+        Execute git merge command & return the result.
+        """
+        cmd = ["git", "merge", merge_from]
+        code, output, error = await execute(cmd, cwd=top_repo_path)
+
+        if code != 0:
+            return {"code": code, "command": " ".join(cmd), "message": error}
+        return {"code": 0}
+
+
     async def commit(self, commit_msg, top_repo_path):
         """
         Execute git commit <filename> command & return the result.
