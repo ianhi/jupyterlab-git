@@ -268,7 +268,7 @@ export const performMergeClass = style({
   textOverflow: 'ellipsis',
   $nest: {
     '&:disabled': {
-      backgroundColor: 'black'
+      opacity: "0.3"
     }
   }
 });

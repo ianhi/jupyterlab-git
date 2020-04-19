@@ -237,15 +237,22 @@ export class BranchDialog extends React.Component<
     );
   }
   private _renderMergeButton() {
+    let disabled = this.state.base === this.state.current;
     return (
       <button
         className={classes(buttonClass, performMergeClass)}
         type="button"
         title="Merge into current branch."
-        disabled={this.state.base === this.state.current}
+        disabled={disabled}
         onClick={this._onMerge}
       >
-        merge <b>{this.state.base}</b> into <b>{this.state.current}</b>
+        {disabled ? (
+          'Please select a branch'
+        ) : (
+          <div>
+            merge <b>{this.state.base}</b> into <b>{this.state.current}</b>
+          </div>
+        )}
       </button>
     );
   }
