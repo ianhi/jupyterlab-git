@@ -107,6 +107,8 @@ export const mergeBranchButtonClass = style({
   border: '0',
   borderRadius: '3px',
 
+  borderTop:
+    'var(--jp-border-width) solid var(--jp-border-color2)!important',
   overflow: 'hidden',
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',

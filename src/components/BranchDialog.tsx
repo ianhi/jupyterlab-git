@@ -10,7 +10,6 @@ import { Git, IGitExtension } from '../tokens';
 import {
   actionsWrapperClass,
   activeListItemClass,
-  branchDialogClass,
   buttonClass,
   cancelButtonClass,
   closeButtonClass,
@@ -27,7 +26,9 @@ import {
   listItemIconClass,
   listItemTitleClass,
   listWrapperClass,
+  mergeDialogClass,
   nameInputClass,
+  newBranchDialogClass,
   performMergeClass,
   titleClass,
   titleWrapperClass
@@ -142,10 +143,11 @@ export class BranchDialog extends React.Component<
    * @returns React element
    */
   render(): React.ReactElement {
+    let dialogClass = this.props.mergeDialog ? mergeDialogClass : newBranchDialogClass
     return (
       <Dialog
         classes={{
-          paper: branchDialogClass
+          paper: dialogClass 
         }}
         open={this.props.open}
         onClose={this._onClose}

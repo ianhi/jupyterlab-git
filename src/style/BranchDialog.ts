@@ -1,7 +1,17 @@
 import { style } from 'typestyle';
 
-export const branchDialogClass = style({
+export const newBranchDialogClass = style({
   height: '460px',
+  width: '400px',
+
+  color: 'var(--jp-ui-font-color1)!important',
+
+  borderRadius: '3px!important',
+
+  backgroundColor: 'var(--jp-layout-color1)!important'
+});
+export const mergeDialogClass = style({
+  height: '400px',
   width: '400px',
 
   color: 'var(--jp-ui-font-color1)!important',
@@ -268,7 +278,7 @@ export const performMergeClass = style({
   textOverflow: 'ellipsis',
   $nest: {
     '&:disabled': {
-      opacity: "0.3"
+      opacity: '0.3'
     }
   }
 });
