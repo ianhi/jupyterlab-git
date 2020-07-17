@@ -12,7 +12,8 @@ import {
 } from '../style/FileItemStyle';
 import { Git } from '../tokens';
 import { FilePath } from './FilePath';
-
+// import { CSSProperties } from 'React';
+import { CSSProperties } from '@material-ui/core/styles/withStyles';
 // Git status codes https://git-scm.com/docs/git-status
 export const STATUS_CODES = {
   M: 'Modified',
@@ -32,6 +33,7 @@ export interface IFileItemProps {
   markBox?: boolean;
   model: GitExtension;
   onDoubleClick: () => void;
+  style: CSSProperties;
   selected?: boolean;
   selectFile?: (file: Git.IStatusFile | null) => void;
 }
@@ -96,6 +98,7 @@ export class FileItem extends React.Component<IFileItemProps> {
         }
         onDoubleClick={this.props.onDoubleClick}
         title={`${this.props.file.to} ● ${status}`}
+        style={this.props.style}
       >
         {this.props.markBox && (
           <GitMarkBox
