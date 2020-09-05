@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.5', '3.6', '3.7', '3.8']
+        python-version: [3.6', '3.7', '3.8']
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -58,7 +58,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install wheel
-          pip install --upgrade --upgrade-strategy=eager pytest pytest-asyncio "jupyterlab~=2.0" black
+          pip install --upgrade --upgrade-strategy=eager pytest pytest-asyncio black "jupyterlab~=2.0"
 
       - name: Test the extension
         run: |
