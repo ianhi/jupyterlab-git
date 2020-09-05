@@ -61,17 +61,17 @@ jobs:
           pip install --upgrade --upgrade-strategy=eager pytest pytest-asyncio "jupyterlab~=2.0"
 
       - name: Install black
-        if: ${{ matrix.python-version }} != '3.5'
+        if: ${{ matrix.python-version }} != 3.5
         run: pip install --upgrade black
 
       - name: Linting and Formatting
-        if: ${{ matrix.python-version }} == '3.5'
+        if: ${{ matrix.python-version }} == 3.5
         run: |
           # Linter checks
           jlpm run eslint-check
 
       - name: Linting and Formatting
-        if: ${{ matrix.python-version }} != '3.5'
+        if: ${{ matrix.python-version }} != 3.5
         run: |
           # Linter checks
           jlpm run eslint-check
