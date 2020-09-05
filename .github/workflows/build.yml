@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.6', '3.7', '3.8']
+        python-version: ['3.5', '3.6', '3.7', '3.8']
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -58,17 +58,31 @@ jobs:
       - name: Install dependencies
         run: |
           pip install wheel
-          pip install --upgrade --upgrade-strategy=eager pytest pytest-asyncio black "jupyterlab~=2.0"
+          pip install --upgrade --upgrade-strategy=eager pytest pytest-asyncio "jupyterlab~=2.0"
 
-      - name: Test the extension
+      - name: Install black
+        if: ${{ matrix.python-version }} != '3.5'
+        run: pip install --upgrade black
+
+      - name: Linting and Formatting
+        if: ${{ matrix.python-version }} == '3.5'
         run: |
-          # Build the sdist (identical to what will be uploaded to eg pypi on release)
-          python setup.py sdist
+          # Linter checks
+          jlpm run eslint-check
+
+      - name: Linting and Formatting
+        if: ${{ matrix.python-version }} != '3.5'
+        run: |
           # Linter checks
           jlpm run eslint-check
 
           # Python formatting checks
           black . --check
+
+      - name: Test the extension
+        run: |
+          # Build the sdist (identical to what will be uploaded to eg pypi on release)
+          python setup.py sdist
         
           # Install the extension from the sdist ensuring the cache is unused
           pip install jupyterlab_git[test] --pre --no-index --find-links=dist --no-deps --no-cache-dir -v
